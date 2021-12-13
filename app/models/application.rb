@@ -7,4 +7,6 @@ class Application < ApplicationRecord
     validates :reason, presence: true
     has_many :pet_applications
     has_many :pets, through: :pet_applications
+
+    
 end

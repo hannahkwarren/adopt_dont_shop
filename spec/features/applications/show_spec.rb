@@ -69,9 +69,31 @@ RSpec.describe 'Application show page' do
 
         fill_in :search, with: "Ba"
         click_on("Search")
-    
+
         expect(page).to have_content(pet_1.name)
         expect(page).to have_content(pet_2.name)
         expect(page).to_not have_content(pet_3.name)
-      end
+    end
+
+    it "adds a pet from search results to an application" do 
+        shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+        pet_1 = Pet.create(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
+        pet_2 = Pet.create(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
+        pet_3 = Pet.create(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
+        application10 = Application.create(name: "Jeff Daniels", address: "456 Orderly Way", city: "Seattle", state: "WA", zip: "65412", reason: "I want to help as many innocent animals as I can.", status: "in progress")
+
+        visit "/applications/#{application10.id}"
+
+        fill_in :search, with: "Ba"
+        click_on("Search")
+
+        click_button("Adopt Bare-y Manilow") 
+
+        expect(current_path).to eq("/applications/#{application10.id}")
+        expect(application10.pets).to match_array([pet_1])
+
+        expect(page).to have_content("Bare-y Manilow")
+        expect(page).to_not have_content("Babe")
+        expect(page).to_not have_content("Elle")
+    end
 end
