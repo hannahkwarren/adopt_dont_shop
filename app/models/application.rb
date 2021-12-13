@@ -7,6 +7,10 @@ class Application < ApplicationRecord
     validates :reason, presence: true
     has_many :pet_applications
     has_many :pets, through: :pet_applications
-
     
+    # , on: :pending
+    # def pending
+    #     self.status = "pending"
+    #     save(context: :pending)
+    # end
 end
