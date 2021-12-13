@@ -1,3 +1,8 @@
+PetApplication.destroy_all
+Application.destroy_all
+Pet.destroy_all
+Shelter.destroy_all
+
 helping_hounds = Shelter.create!(name: 'Helping Hounds', city: 'Syracuse, NY', foster_program: false, rank: 2)
 
 max = Pet.create!(name: 'Max', age: 1, breed: 'Great Dane', adoptable: true, shelter_id: helping_hounds.id)

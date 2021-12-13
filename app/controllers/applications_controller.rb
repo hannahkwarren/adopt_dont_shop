@@ -34,6 +34,23 @@ class ApplicationsController < ApplicationController
         redirect_to "/applications/#{@application.id}"
     end
 
+    def edit
+        @application = Application.find(params[:id])
+    end
+
+    def update 
+        @application = Application.find(params[:id])
+        
+        if @application.update(application_params)
+            @application.status = "pending"
+            @application.save
+            redirect_to "/applications/#{@application.id}"
+        else
+            redirect_to "/applications/#{@application.id}"
+            flash[:alert] = "Error: #{error_message(@application.errors)}"
+        end
+    end
+
 private
     def application_params
         params.permit(:name, :address, :city, :state, :zip, :reason, :status, :pet_id)
