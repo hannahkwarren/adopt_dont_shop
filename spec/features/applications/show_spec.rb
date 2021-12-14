@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Application show page' do 
+RSpec.describe 'Application show page', type: :feature do 
 
     before(:each) do
 
@@ -20,7 +20,7 @@ RSpec.describe 'Application show page' do
 
     end
 
-    it 'displays applicant information for an application' do
+    it 'displays applicant information for an application with each pet as a link to the pet show page' do
         visit "/applications/#{@application1.id}"
 
         expect(page).to have_content(@application1.name)
@@ -75,6 +75,33 @@ RSpec.describe 'Application show page' do
         expect(page).to_not have_content(pet_3.name)
     end
 
+    it "search is not case-sensitive" do 
+#         As a visitor
+# When I visit an application show page
+# And I search for Pets by name
+# Then my search is case insensitive
+# For example, if I search for "fluff", my search would match pets with names "Fluffy", "FLUFF", and "Mr. FlUfF"
+        shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+        pet_1 = Pet.create(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
+        pet_2 = Pet.create(adoptable: true, age: 3, breed: 'domestic pig', name: 'Babe', shelter_id: shelter.id)
+        pet_3 = Pet.create(adoptable: true, age: 4, breed: 'chihuahua', name: 'Elle', shelter_id: shelter.id)
+        application3 = Application.create(name: "Jeff Daniels", address: "456 Orderly Way", city: "Seattle", state: "WA", zip: "65412", reason: "I want to help as many innocent animals as I can.", status: "in progress")
+
+        visit "/applications/#{application3.id}"
+
+        fill_in :search, with: "BA"
+        click_on("Search")
+        expect(page).to have_content("Bare-y Manilow")
+
+        fill_in :search, with: "bArE"
+        click_on("Search")
+        expect(page).to have_content("Bare-y Manilow")
+
+        fill_in :search, with: "manilow"
+        click_on("Search")
+        expect(page).to have_content("Bare-y Manilow")
+    end
+
     it "adds a pet from search results to an application" do 
         shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
         pet_1 = Pet.create(adoptable: true, age: 7, breed: 'sphynx', name: 'Bare-y Manilow', shelter_id: shelter.id)
@@ -120,6 +147,17 @@ RSpec.describe 'Application show page' do
         expect(page).to have_content("I want to help as many innocent animals as I can.")
         expect(page).to have_content("pending")
         expect(page).to_not have_content("in progress")
+    end
+
+    it "if there are no pets, the submit section does not appear" do
+        shelter = Shelter.create(name: 'Aurora shelter', city: 'Aurora, CO', foster_program: false, rank: 9)
+
+        application10 = Application.create(name: "Jeff Daniels", address: "456 Orderly Way", city: "Seattle", state: "WA", zip: "65412", reason: "I want to help as many innocent animals as I can.", status: "in progress")
+
+        visit "/applications/#{application10.id}"
+
+        expect(page).to_not have_content("Tell us why you want to adopt:")
+        expect(page).to_not have_content("Submit Application")
     end
 
 end
